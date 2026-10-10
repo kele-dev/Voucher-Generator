@@ -1,0 +1,4 @@
+# crontab -u www-data -e   — one entry drives every scheduled task
+# (backups 02:00, verify 02:30, export pruning 03:00, heartbeats every minute;
+# see routes/console.php).
+* * * * * cd /var/www/voucher/current && php artisan schedule:run >> /dev/null 2>&1

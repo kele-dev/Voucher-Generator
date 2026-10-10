@@ -1,0 +1,314 @@
+@import 'tailwindcss';
+
+/* Poppins only: it is the font the server renders vouchers with, so the UI
+   and the printed output share one typeface. Karla and Playfair were imported
+   but never referenced by a token or class, so they are gone. */
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/*
+ * Boedjang Voucher Studio.
+ * Warm culinary identity: a single terracotta brand tone, a warm off-white
+ * canvas, and warm-neutral ink. No purple/cyan gradient family, no decorative
+ * radial orbs. Colour is used to mark state, not to fill space.
+ */
+@theme {
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+
+    --color-primary: #9a3412;
+    --color-primary-hover: #7c2d12;
+    --color-primary-soft: #fdf2ec;
+    --color-primary-line: #eec9b2;
+    --color-on-primary: #ffffff;
+
+    /* One brand hue family. "accent" is the darker tone of the same hue, kept
+       as a token so existing component variants stay coherent. */
+    --color-accent: #7c2d12;
+    --color-accent-hover: #69250f;
+    --color-accent-soft: #f7e9e0;
+
+    --color-danger: #b91c1c;
+    --color-danger-hover: #991b1b;
+    --color-danger-soft: #fef2f2;
+    --color-danger-line: #fecaca;
+
+    --color-canvas: #faf7f4;
+    --color-surface: #ffffff;
+    --color-sidebar: #ffffff;
+    --color-line: #ece5df;
+    /* Control boundaries only (inputs, dropzones): needs 3:1 for WCAG 1.4.11. */
+    --color-line-strong: #948579;
+    --color-ink: #1c1917;
+    --color-ink-muted: #6b5d54;
+
+    /* Elevation is a marker, not a default: 1 resting card, 2 raised, 3 overlay. */
+    --shadow-2xs: 0 1px 1px rgba(28, 25, 23, 0.04);
+    --shadow-card: 0 1px 2px rgba(28, 25, 23, 0.05), 0 1px 3px rgba(28, 25, 23, 0.05);
+    --shadow-soft: 0 6px 16px -6px rgba(28, 25, 23, 0.12);
+    --shadow-lift: 0 16px 32px -12px rgba(28, 25, 23, 0.22);
+
+    /* MOTION dial: "terkendali" (restrained).
+       Feedback 140ms, enter 200ms, surface 240ms. Motion only marks a state
+       change (press, focus, open, progress). No entrance cascades, no loops. */
+    --motion-fast: 140ms;
+    --motion-enter: 200ms;
+    --motion-surface: 240ms;
+}
+
+/* Class-based dark mode so the toggle (not the OS alone) decides. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Dark theme: same tokens, cool-corrected warm neutrals. */
+.dark {
+    --color-primary: #e8a07c;
+    --color-primary-hover: #f0b596;
+    --color-primary-soft: #3a2417;
+    --color-primary-line: #5a3a26;
+    --color-on-primary: #17130f;
+
+    --color-accent: #f0b596;
+    --color-accent-hover: #f6c7ad;
+    --color-accent-soft: #3a2417;
+
+    --color-danger: #f87171;
+    --color-danger-hover: #fca5a5;
+    --color-danger-soft: #3a1d1d;
+    --color-danger-line: #5a2a2a;
+
+    --color-canvas: #17130f;
+    --color-surface: #221c17;
+    --color-sidebar: #1b1613;
+    --color-line: #352d26;
+    --color-line-strong: #7a6d60;
+    --color-ink: #f5f1ec;
+    --color-ink-muted: #b3a79c;
+}
+
+@layer base {
+    html {
+        -webkit-tap-highlight-color: transparent;
+        color-scheme: light;
+    }
+
+    html.dark {
+        color-scheme: dark;
+    }
+
+    body {
+        background-color: var(--color-canvas);
+        color: var(--color-ink);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    button:not(:disabled),
+    [role='button'],
+    summary,
+    label[for] {
+        cursor: pointer;
+    }
+
+    ::-webkit-scrollbar {
+        width: 7px;
+        height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--color-line-strong);
+        border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-ink-muted);
+    }
+}
+
+@layer components {
+    .input {
+        @apply block w-full rounded-xl border border-line-strong bg-surface px-4 py-2.5 text-sm font-medium text-ink shadow-2xs
+            placeholder:text-ink-muted/75 focus:border-primary focus:ring-4 focus:ring-primary/15 focus:outline-none
+            disabled:cursor-not-allowed disabled:bg-canvas disabled:text-ink-muted;
+    }
+
+    .checkbox {
+        @apply size-4.5 rounded-md border-line-strong text-primary accent-primary transition focus:ring-2 focus:ring-primary/30;
+    }
+
+    .card {
+        @apply rounded-2xl border border-line bg-surface shadow-card;
+    }
+
+    .table-wrap {
+        @apply overflow-x-auto rounded-2xl border border-line bg-surface shadow-card;
+    }
+
+    .table {
+        @apply w-full text-left text-sm;
+
+        & thead {
+            @apply border-b border-line bg-canvas/60 text-[11px] font-bold tracking-wider text-ink-muted uppercase;
+        }
+
+        & th {
+            @apply px-5 py-4 whitespace-nowrap;
+        }
+
+        & td {
+            @apply px-5 py-4 align-middle;
+        }
+
+        & tbody tr {
+            @apply border-b border-line/70 transition-colors last:border-0 hover:bg-primary-soft/50;
+        }
+    }
+
+    .link {
+        @apply font-semibold text-primary underline-offset-2 hover:text-primary-hover hover:underline;
+    }
+
+    /* MI-03: the label warms to the brand tone while its control is focused. */
+    .field-label {
+        @apply mb-1.5 flex items-center justify-between text-sm font-semibold text-ink transition-colors duration-150;
+    }
+    .field-group:focus-within .field-label {
+        color: var(--color-primary);
+    }
+}
+
+/* Dark mode: a solid brand fill carries dark text (light-on-dark inverts).
+   Specificity (0,2,0) beats the single-class `.text-white`. */
+@layer utilities {
+    .dark .bg-primary,
+    .dark .bg-primary.text-white,
+    .dark .bg-primary .text-white,
+    .dark .bg-accent,
+    .dark .bg-accent.text-white,
+    .dark .bg-accent .text-white,
+    .dark .bg-danger,
+    .dark .bg-danger.text-white,
+    .dark .bg-danger .text-white {
+        color: var(--color-on-primary);
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Motion dial keyframes (see tokens above). */
+@keyframes as-enter {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes as-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes as-toast-bar {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+@keyframes as-shimmer {
+    from {
+        background-position: -150% 0;
+    }
+    to {
+        background-position: 250% 0;
+    }
+}
+
+.motion-enter {
+    animation: as-enter var(--motion-enter) ease-out both;
+}
+
+/* MI-06: native <dialog> re-runs this each time showModal() flips it to open. */
+dialog[open] {
+    animation: as-pop var(--motion-enter) ease-out both;
+}
+
+dialog[open]::backdrop {
+    animation: as-enter var(--motion-enter) ease-out both;
+}
+
+/* MI-11: skeleton shimmer while a preview loads. */
+.shimmer {
+    background: linear-gradient(
+        100deg,
+        color-mix(in oklab, var(--color-line) 70%, transparent) 30%,
+        color-mix(in oklab, var(--color-line-strong) 45%, transparent) 50%,
+        color-mix(in oklab, var(--color-line) 70%, transparent) 70%
+    );
+    background-size: 200% 100%;
+    animation: as-shimmer 1.4s ease-in-out infinite;
+}
+
+/* MI-05: monospace voucher code with a copy affordance. */
+.voucher-code {
+    @apply font-mono font-bold tracking-wider text-ink;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Poppins: the font vouchers are rendered with; the editor previews it. */
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-display: swap;
+}
